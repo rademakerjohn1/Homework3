@@ -11,24 +11,25 @@ var charString = "";
 var finalString = "";
 var passwordText = document.querySelector("#password");
 
-// Prompt user to enter password length between 8-128 characters, store length
+// Prompt user to enter password length between 8-128 characters, run selectCharType if valid number
 function findPasswordLength() {
+
     passwordLength = prompt("Choose character length \n(at least 8 and no more than 128)");
     
     if (passwordLength >= 8 && passwordLength <= 128) {
         alert("Your password will be " + passwordLength + " characters long");
+        selectCharType();
     }
-
-    else if (passWordLength === null) {
+    else if (passwordLength === null) {
         return;
+        
     }
-
     else if (typeof(passwordLength) !== "number" || passwordLength < 8 || passwordLength > 128) {
         findPasswordLength();
     }
 }
 
-// Prompt user to choose at least one character type, store boolean values
+// Prompt user to choose at least one character type, store results, run generateCharString() if at least one type is chosen
 function selectCharType() {
 
     alert("Choose at least one character type to include: \n  1. Uppercase \n  2. Lowercase \n  3. Numeric \n  4. Special");
@@ -41,9 +42,12 @@ function selectCharType() {
     if (upperChar === false && lowerChar === false && numChar === false && specialChar === false) {
         selectCharType();
     }
+    else if (upperChar === true || lowerChar === true || numChar === true || specialChar === true) {
+        generateCharString();
+    }
 }
 
-// Adds string of characters to empty charString based on presence of true values from selectCharType()
+// Adds string of characters to empty charString based on presence of true values from selectCharType(), runs generatePassword() if there are characters in string
 function generateCharString() {
 
     if (upperChar === true) {
@@ -58,6 +62,10 @@ function generateCharString() {
     if (specialChar === true) {
         charString += " !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
     }
+
+    if (charString !== "") {
+        generatePassword();
+    }
 }
 
 // Generates and returns random string from charString
@@ -65,18 +73,27 @@ function generatePassword() {
     for (var i = 0; i < passwordLength; i++) {
         finalString += charString.charAt(Math.floor(Math.random() * charString.length));
     }
-    return finalString;
+    
+    if (finalString === "") {
+        return;
+    }
+    else { 
+        generateBtn.disabled = true;
+        clearBtn.disabled = false;
+        return finalString;
+    }
 }
 
 // Calls series of functions when generateBtn is clicked, outputs random password
 function writePassword() {
     findPasswordLength();
-    selectCharType();
-    generateCharString();
-    var password = generatePassword();
-    passwordText.value = password;
-    generateBtn.disabled = true;
-    clearBtn.disabled = false;
+    
+    if (finalString === "") {
+        return;
+    }
+    else {
+        passwordText.value = finalString;
+    }
 }
 
 // Clears current password
